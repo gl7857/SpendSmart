@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "287550683056",
+    "project_id": "spendsmart-2a664",
+    "storage_bucket": "spendsmart-2a664.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:287550683056:android:09660529ed4e855bd60875",
+        "android_client_info": {
+          "package_name": "com.example.spendsmart"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6RHP1EshsdhZR5i1zF_UYpLoJoRLo9Wk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
