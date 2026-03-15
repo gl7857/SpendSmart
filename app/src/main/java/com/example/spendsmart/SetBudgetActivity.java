@@ -13,7 +13,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SetBudgetActivity extends AppCompatActivity {
-
     private LinearLayout containerBudgets;
     private ImageButton btnAddCategory;
     private ImageButton btnRemoveCategory;
