@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/splash_background"
@@ -24,26 +25,30 @@
             android:fontFamily="sans-serif-black"
             android:layout_marginBottom="60dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/button_signup"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:text="SIGN UP"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
-            android:background="@drawable/black_button_background"
+            app:backgroundTint="#000000"
             android:layout_marginBottom="20dp"
             android:fontFamily="sans-serif-medium"
-            android:stateListAnimator="@null" /> <Button
-        android:id="@+id/button_login"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:text="LOG IN"
-        android:textColor="#FFFFFF"
-        android:textSize="18sp"
-        android:background="@drawable/black_button_background"
-        android:fontFamily="sans-serif-medium"
-        android:stateListAnimator="@null" />
+            android:stateListAnimator="@null"
+            app:cornerRadius="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_login"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="LOG IN"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            app:backgroundTint="#000000"
+            android:fontFamily="sans-serif-medium"
+            android:stateListAnimator="@null"
+            app:cornerRadius="8dp" />
 
     </LinearLayout>
 
