@@ -96,7 +96,7 @@ public class LogInActivity extends AppCompatActivity {
                             Toast.makeText(LogInActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
 
                             // מעבר למסך הראשי
-                            Intent intent = new Intent(LogInActivity.this, MainActivity.class);
+                            Intent intent = new Intent(LogInActivity.this, ExpenseTypeActivity.class);
                             startActivity(intent);
                             finish(); // סוגר את מסך הלוגין כדי שלא יחזרו אליו בלחיצה על "Back"
                         } else {

@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">SpendSmart</string>
+
+    <string-array name="categories_array">
+        <item>""</item>
+        <item>Food</item>
+        <item>Shopping</item>
+        <item>Transport</item>
+        <item>Entertainment</item>
+        <item>Other</item>
+    </string-array>
+
 </resources>
