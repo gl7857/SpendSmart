@@ -37,7 +37,6 @@ public class ManualEntryActivity extends AppCompatActivity {
 
         setupCategorySpinner();
 
-        // --- תוספת: קבלת נתונים שהגיעו מה-AI ב-ScanReceiptActivity ---
         if (getIntent() != null) {
             String preAmount = getIntent().getStringExtra("pre_amount");
             String preDate = getIntent().getStringExtra("pre_date");
@@ -96,11 +95,10 @@ public class ManualEntryActivity extends AppCompatActivity {
                         .addOnSuccessListener(aVoid -> {
                             Toast.makeText(ManualEntryActivity.this, "Saved Successfully!", Toast.LENGTH_SHORT).show();
 
-                            // --- תוספת: מעבר אוטומטי למסך ההיסטוריה אחרי שמירה ---
                             Intent intent = new Intent(ManualEntryActivity.this, HistoryActivity.class);
                             startActivity(intent);
 
-                            finish(); // סוגר את המסך הנוכחי
+                            finish();
                         })
                         .addOnFailureListener(e -> {
                             Toast.makeText(ManualEntryActivity.this, "Failed to save: " + e.getMessage(), Toast.LENGTH_SHORT).show();

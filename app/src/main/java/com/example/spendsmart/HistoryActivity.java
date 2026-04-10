@@ -75,21 +75,17 @@ public class HistoryActivity extends AppCompatActivity {
                     return;
                 }
 
-                // 2. כמה ילדים יש בתוך התיקייה?
                 long count = snapshot.getChildrenCount();
                 Toast.makeText(HistoryActivity.this, "DEBUG: Found " + count + " items", Toast.LENGTH_SHORT).show();
 
                 for (DataSnapshot data : snapshot.getChildren()) {
                     try {
-                        // 3. הדפסה ללוג כדי לראות את השמות המדויקים
                         Log.d("HistoryDB", "Full Object: " + data.toString());
 
-                        // נסיון שליפה הכי גנרי שיש
                         String cat = String.valueOf(data.child("category").getValue());
                         String dt = String.valueOf(data.child("date").getValue());
                         String amt = String.valueOf(data.child("amount").getValue());
 
-                        // אם השליפה הצליחה (גם אם זה לא Expense Class מושלם)
                         if (!cat.equals("null") && !dt.equals("null")) {
                             allExpenses.add(new Expense(cat, Double.parseDouble(amt), dt));
                         }
@@ -122,7 +118,6 @@ public class HistoryActivity extends AppCompatActivity {
             for (Expense exp : allExpenses) {
                 String date = exp.getDate();
                 if (date != null) {
-                    // מנקה רווחים ומפצל לפי לוכסן
                     String[] parts = date.trim().split("/");
                     if (parts.length >= 2) {
                         try {

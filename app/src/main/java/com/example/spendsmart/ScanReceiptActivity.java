@@ -104,11 +104,10 @@ public class ScanReceiptActivity extends AppCompatActivity {
                         .addOnSuccessListener(aVoid -> {
                             Toast.makeText(this, "Expense saved successfully!", Toast.LENGTH_SHORT).show();
 
-                            // --- עדכון: מעבר למסך ההיסטוריה אחרי שמירה מוצלחת ---
                             Intent intent = new Intent(ScanReceiptActivity.this, HistoryActivity.class);
                             startActivity(intent);
 
-                            finish(); // סוגר את המסך הנוכחי
+                            finish();
                         })
                         .addOnFailureListener(e -> Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
@@ -176,12 +175,10 @@ public class ScanReceiptActivity extends AppCompatActivity {
                 foundData = true;
             }
 
-            // 3. חילוץ וקביעת קטגוריה - התיקון כאן:
             if (result.contains("Category:")) {
                 String aiCategory = result.split("Category:")[1].trim();
                 boolean foundInSpinner = false;
 
-                // עוברים על כל הפריטים ב-Spinner כדי למצוא התאמה
                 for (int i = 0; i < spinnerCategory.getCount(); i++) {
                     if (spinnerCategory.getItemAtPosition(i).toString().equalsIgnoreCase(aiCategory)) {
                         spinnerCategory.setSelection(i);
@@ -190,14 +187,11 @@ public class ScanReceiptActivity extends AppCompatActivity {
                     }
                 }
 
-                // אם הקטגוריה מה-AI לא קיימת ב-Spinner, נבחר ב-"Other"
                 if (!foundInSpinner) {
-                    // נחפש את המיקום של "Other" (בדרך כלל האחרון)
                     for (int i = 0; i < spinnerCategory.getCount(); i++) {
                         if (spinnerCategory.getItemAtPosition(i).toString().equalsIgnoreCase("Other")) {
                             spinnerCategory.setSelection(i);
 
-                            // מציגים וממלאים את שדה ה-"Other" הידני
                             EditText etOther = findViewById(R.id.et_other_category);
                             if (etOther != null) {
                                 etOther.setVisibility(View.VISIBLE);
@@ -226,10 +220,8 @@ public class ScanReceiptActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .setPositiveButton("Try Again", (dialog, which) -> getPhoto())
                 .setNegativeButton("Manual Entry", (dialog, which) -> {
-                    // מעבר למסך ההקלדה הידנית (ManualEntryActivity)
                     Intent intent = new Intent(ScanReceiptActivity.this, ManualEntryActivity.class);
 
-                    // שליחת הנתונים שה-AI מצא (אם מצא)
                     intent.putExtra("pre_amount", etAmount.getText().toString());
                     intent.putExtra("pre_date", etDate.getText().toString());
 
