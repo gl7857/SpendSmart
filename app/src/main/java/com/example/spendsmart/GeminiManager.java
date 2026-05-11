@@ -28,7 +28,6 @@ public class GeminiManager {
 
     // בתוך GeminiManager.java
     private GeminiManager() {
-        // שינוי השם מ-gemini-pro-vision ל-gemini-1.5-flash
         gemini = new GenerativeModel(
                 "gemini-2.5-flash",
                 BuildConfig.GEMINI_API_KEY
@@ -42,11 +41,8 @@ public class GeminiManager {
         return instance;
     }
 
-    /**
-     * פונקציה לשליחת טקסט ותמונה ל-Gemini
-     */
+
     public void sendTextWithPhotoPrompt(String prompt, Bitmap photo, GeminiCallBack callback) {
-        // יצירת חלקי התוכן (טקסט ותמונה)
         List<Part> parts = new ArrayList<>();
         parts.add(new TextPart(prompt));
         parts.add(new ImagePart(photo));
@@ -54,7 +50,6 @@ public class GeminiManager {
         Content[] content = new Content[1];
         content[0] = new Content(parts);
 
-        // שליחת הבקשה בצורה אסינכרונית
         gemini.generateContent(content,
                 new Continuation<GenerateContentResponse>() {
                     @NonNull

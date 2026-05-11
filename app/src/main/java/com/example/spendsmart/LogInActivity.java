@@ -21,18 +21,47 @@ import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * Activity for user login.
+ * This activity allows the user to log into the SpendSmart application
+ * using email and password authentication with Firebase.
+ * It also provides navigation to the Sign Up screen and
+ * Forgot Password screen.
+ *
+ * @author      Gali Lavi <gl7857@bs.amalnet.k12.il>
+ * @version     1.0
+ * @since       11/05/2026
+ *
+ * short description:
+ *        This activity handles user authentication.
+ *        It validates input fields, performs Firebase sign-in,
+ *        displays progress while connecting, handles errors
+ *        (such as network problems or invalid credentials),
+ *        and navigates the user to the main expenses screen
+ *        upon successful login.
+ */
 public class LogInActivity extends AppCompatActivity {
 
     private EditText eTEmail, eTPass;
     private Button btn_login;
     private TextView tVMsg, tvGoToSignup, tv_forgot_password;
 
+    /**
+     * Initializes the activity.
+     *
+     * This method:
+     * - Sets the layout of the login screen.
+     * - Connects UI components to their XML IDs.
+     * - Sets click listeners for:
+     *      - Login button
+     *      - Sign up navigation
+     *      - Forgot password navigation
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_log_in); // וודא שזה שם ה-XML של מסך ההתחברות
+        setContentView(R.layout.activity_log_in);
 
-        // קישור רכיבים לפי ה-IDs ב-XML החדש
         eTEmail = findViewById(R.id.et_login_email);
         eTPass = findViewById(R.id.et_login_password);
         btn_login = findViewById(R.id.btn_login);
@@ -52,27 +81,35 @@ public class LogInActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(LogInActivity.this, ForgotPasswordActivity.class);
                 startActivity(intent);
-
                 finish();
             }
         });
 
-        // מעבר למסך הרשמה
         tvGoToSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LogInActivity.this, SignUpActivity.class);
                 startActivity(intent);
-                // לא חייב finish() כאן כדי שהמשתמש יוכל לחזור אחורה
             }
         });
     }
 
+    /**
+     * Handles the user login process.
+     *
+     * This method:
+     * - Retrieves the email and password from input fields.
+     * - Validates that the fields are not empty.
+     * - Displays a progress dialog while connecting to Firebase.
+     * - Attempts to sign in using Firebase Authentication.
+     * - Handles success and failure cases.
+     * - Navigates to ExpenseTypeActivity upon successful login.
+     */
     public void loginUser() {
+
         String email = eTEmail.getText().toString().trim();
         String pass = eTPass.getText().toString().trim();
 
-        // בדיקה שהשדות לא ריקים
         if (email.isEmpty() || pass.isEmpty()) {
             tVMsg.setText("Please enter email and password");
             return;
@@ -83,30 +120,35 @@ public class LogInActivity extends AppCompatActivity {
         pd.setMessage("Logging in...");
         pd.show();
 
-        // שימוש בפונקציית כניסה (Sign In) ולא יצירה
         refAuth.signInWithEmailAndPassword(email, pass)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
+
                         pd.dismiss();
+
                         if (task.isSuccessful()) {
+
                             Log.i("LogInActivity", "signIn:success");
                             FirebaseUser user = refAuth.getCurrentUser();
 
-                            Toast.makeText(LogInActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LogInActivity.this,
+                                    "Login Successful!",
+                                    Toast.LENGTH_SHORT).show();
 
-                            // מעבר למסך הראשי
-                            Intent intent = new Intent(LogInActivity.this, ExpenseTypeActivity.class);
+                            Intent intent = new Intent(LogInActivity.this,
+                                    ExpenseTypeActivity.class);
                             startActivity(intent);
-                            finish(); // סוגר את מסך הלוגין כדי שלא יחזרו אליו בלחיצה על "Back"
+                            finish();
+
                         } else {
+
                             Exception exp = task.getException();
                             Log.e("LogInActivity", "signIn:failure", exp);
 
                             if (exp instanceof FirebaseNetworkException) {
                                 tVMsg.setText("Network error. Check your connection.");
                             } else {
-                                // בדרך כלל טעות במייל או בסיסמה
                                 tVMsg.setText("Invalid email or password.");
                             }
                         }

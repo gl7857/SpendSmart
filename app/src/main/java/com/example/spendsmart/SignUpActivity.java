@@ -5,30 +5,51 @@ import static com.example.spendsmart.FBRef.refAuth;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity; 
+import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseNetworkException;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuthUserCollisionException;
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
+/**
+ * Activity for user registration (Sign Up).
+ * This activity allows new users to create an account
+ * using email and password authentication with Firebase.
+ * It also saves additional user information (full name and balance)
+ * in the Firebase Realtime Database.
+ *
+ * @author      Gali Lavi <gl7857@bs.amalnet.k12.il>
+ * @version     1.0
+ * @since       11/05/2026
+ *
+ * short description:
+ *        This activity enables new user registration.
+ *        It validates input fields, checks password confirmation,
+ *        creates a new Firebase Authentication account,
+ *        stores user data in the database, manages loading progress,
+ *        and navigates the user to the budget setup screen
+ *        upon successful registration.
+ */
 public class SignUpActivity extends AppCompatActivity {
 
-    private EditText eTEmail, eTPass, eTCon;
+    private EditText eTEmail, eTPass, eTCon, eTName;
     private Button btn_register;
-    private TextView tVMsg;
-    private TextView tvBackToLogin;
+    private TextView tVMsg, tvBackToLogin;
+
+    /**
+     * Initializes the Sign Up screen.
+     *
+     * This method:
+     * - Sets the layout of the registration screen.
+     * - Connects UI components to their XML IDs.
+     * - Sets click listeners for:
+     *      - Register button
+     *      - Back to Login navigation
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,38 +58,40 @@ public class SignUpActivity extends AppCompatActivity {
         eTEmail = findViewById(R.id.et_email);
         eTPass = findViewById(R.id.et_password);
         eTCon = findViewById(R.id.et_confirm_password);
+        eTName = findViewById(R.id.et_full_name);
         btn_register = findViewById(R.id.btn_register);
         tVMsg = findViewById(R.id.tv_msg);
         tvBackToLogin = findViewById(R.id.tv_back_to_login);
 
-        btn_register.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        btn_register.setOnClickListener(v -> createUser());
 
-                createUser(v);
-            }
-        });
-
-        tvBackToLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // יצירת Intent למעבר למסך ההתחברות
-                Intent intent = new Intent(SignUpActivity.this, LogInActivity.class);
-                startActivity(intent);
-
-                // אופציונלי: finish() יסגור את מסך ההרשמה כדי שלא יחזרו אליו בלחיצה על "חזור"
-                finish();
-            }
+        tvBackToLogin.setOnClickListener(v -> {
+            startActivity(new Intent(SignUpActivity.this, LogInActivity.class));
+            finish();
         });
     }
 
-    public void createUser(View view) {
+    /**
+     * Creates a new user account.
+     *
+     * This method:
+     * - Retrieves user input (email, password, confirmation, name).
+     * - Validates that all fields are filled.
+     * - Checks that passwords match.
+     * - Displays a progress dialog while processing.
+     * - Creates a Firebase Authentication user.
+     * - Stores additional user data in Firebase Realtime Database.
+     * - Initializes the user session.
+     * - Navigates to SetBudgetActivity upon success.
+     */
+    public void createUser() {
+
         String email = eTEmail.getText().toString().trim();
         String pass = eTPass.getText().toString().trim();
         String conPass = eTCon.getText().toString().trim();
+        String name = eTName.getText().toString().trim();
 
-        // בדיקות תקינות קלט בסיסיות
-        if (email.isEmpty() || pass.isEmpty() || conPass.isEmpty()) {
+        if (email.isEmpty() || pass.isEmpty() || name.isEmpty()) {
             tVMsg.setText("Please fill all fields");
             return;
         }
@@ -79,41 +102,50 @@ public class SignUpActivity extends AppCompatActivity {
         }
 
         ProgressDialog pd = new ProgressDialog(this);
-        pd.setTitle("Connecting");
         pd.setMessage("Creating user...");
         pd.show();
 
         refAuth.createUserWithEmailAndPassword(email, pass)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
+                .addOnCompleteListener(this, task -> {
+
+                    if (task.isSuccessful()) {
+
+                        FirebaseUser firebaseUser = refAuth.getCurrentUser();
+                        String uid = firebaseUser.getUid();
+
+                        User newUser = new User(uid, name, 0.0);
+
+                        FirebaseDatabase.getInstance()
+                                .getReference("users")
+                                .child(uid)
+                                .setValue(newUser)
+                                .addOnCompleteListener(dbTask -> {
+
+                                    pd.dismiss();
+
+                                    if (dbTask.isSuccessful()) {
+
+                                        // Initialize current user session
+                                        UserSession.setCurrentUser(newUser);
+
+                                        Toast.makeText(SignUpActivity.this,
+                                                "Registration Successful!",
+                                                Toast.LENGTH_SHORT).show();
+
+                                        startActivity(new Intent(SignUpActivity.this,
+                                                SetBudgetActivity.class));
+                                        finish();
+
+                                    } else {
+                                        tVMsg.setText("Database error: "
+                                                + dbTask.getException().getMessage());
+                                    }
+                                });
+
+                    } else {
                         pd.dismiss();
-                        if (task.isSuccessful()) {
-                            Log.i("SignUpActivity", "createUser:success");
-
-                            Toast.makeText(SignUpActivity.this, "Registration Successful!", Toast.LENGTH_SHORT).show();
-
-                            // --- כאן השינוי המרכזי ---
-                            // מעבר למסך הגדרת תקציבים (SetBudgetActivity)
-                            Intent intent = new Intent(SignUpActivity.this, SetBudgetActivity.class);
-                            startActivity(intent);
-
-                            // סגירת מסך ההרשמה כדי שלא יהיה אפשר לחזור אליו בכפתור "חזור"
-                            finish();
-                            // -------------------------
-
-                        } else {
-                            Exception exp = task.getException();
-                            if (exp instanceof FirebaseAuthWeakPasswordException) {
-                                tVMsg.setText("Password too weak (min 6 chars).");
-                            } else if (exp instanceof FirebaseAuthUserCollisionException) {
-                                tVMsg.setText("User already exists.");
-                            } else if (exp instanceof FirebaseNetworkException) {
-                                tVMsg.setText("Network error.");
-                            } else {
-                                tVMsg.setText("Error: " + exp.getMessage());
-                            }
-                        }
+                        tVMsg.setText("Error: "
+                                + task.getException().getMessage());
                     }
                 });
     }
